@@ -1,0 +1,215 @@
+﻿@model WinCCCustomDashboardMarefa.Models.PagedResult<WinCCCustomDashboardMarefa.Models.AlarmEvent>
+
+@{
+    ViewData["Title"] = "Redundancy Events";
+    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
+                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+
+    var firstRecord = Model.TotalCount == 0 ? 0
+        : ((Model.PageNumber - 1) * Model.PageSize) + 1;
+    var lastRecord = Math.Min(Model.PageNumber * Model.PageSize, (int)Model.TotalCount);
+}
+
+<div class="page-header">
+    <div>
+        <h1>Redundancy Events</h1>
+        <p class="page-subtitle">Redundancy and failover related alarms</p>
+    </div>
+</div>
+
+@await Html.PartialAsync("_ReportsNav")
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Filters</h2>
+            <span class="card-description">Filter redundancy events</span>
+        </div>
+    </div>
+
+    <form asp-controller="Reports" asp-action="RedundancyEvents" method="get" class="report-filters">
+
+        <input type="hidden" name="page" value="1" />
+        <input type="hidden" name="pageSize" value="@Model.PageSize" />
+
+        <div class="filter-group search-group">
+            <label for="search">Search</label>
+            <input type="text" id="search" name="search" value="@filter.Search"
+                   placeholder="Search alarm..." />
+        </div>
+
+        <div class="filter-group">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+                <option value="">All Priorities</option>
+                <option value="0" selected="@(filter.Priority == 0 ? "selected" : null)">0</option>
+                <option value="1" selected="@(filter.Priority == 1 ? "selected" : null)">1</option>
+                <option value="4" selected="@(filter.Priority == 4 ? "selected" : null)">4</option>
+                <option value="12" selected="@(filter.Priority == 12 ? "selected" : null)">12</option>
+                <option value="16" selected="@(filter.Priority == 16 ? "selected" : null)">16</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="sourceServer">Source Server</label>
+            <select id="sourceServer" name="sourceServer">
+                <option value="">All Servers</option>
+                <option value="SRV-01" selected="@(filter.SourceServer == "SRV-01" ? "selected" : null)">SRV-01</option>
+                <option value="SRV-02" selected="@(filter.SourceServer == "SRV-02" ? "selected" : null)">SRV-02</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="startDate">From</label>
+            <input type="datetime-local" id="startDate" name="startDate"
+                   value="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-group">
+            <label for="endDate">To</label>
+            <input type="datetime-local" id="endDate" name="endDate"
+                   value="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a asp-controller="Reports" asp-action="RedundancyEvents" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="report-actions-bar">
+    <div>
+        @if (Model.TotalCount > 0)
+        {
+            <span class="results-info">
+                Showing <strong>@firstRecord</strong> - <strong>@lastRecord</strong>
+                of <strong>@Model.TotalCount</strong> records
+            </span>
+        }
+        else
+        {
+            <span class="results-info">No records found</span>
+        }
+    </div>
+
+    <a asp-controller="Reports" asp-action="ExportCategoryEvents"
+       asp-route-category="Redundancy"
+       asp-route-search="@filter.Search"
+       asp-route-priority="@filter.Priority"
+       asp-route-sourceServer="@filter.SourceServer"
+       asp-route-startDate="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))"
+       asp-route-endDate="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))"
+       class="btn btn-danger">Generate PDF</a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Redundancy Event Log</h2>
+            <span class="card-description">Filtered events</span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Alarm Name</th>
+                    <th>Raise Time</th>
+                    <th>Priority</th>
+                    <th>Source Server</th>
+                    <th>Synced At</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="empty-state">No redundancy events found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var alarm in Model.Items)
+                    {
+                        <tr>
+                            <td>@alarm.Id</td>
+                            <td><span class="alarm-name">@alarm.AlarmName</span></td>
+                            <td class="alarm-time" data-utc="@alarm.RaiseTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"></td>
+                            <td>
+                                @if (alarm.Priority.HasValue)
+                                {
+                                    <span class="priority-badge">@alarm.Priority</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td><span class="server-badge">@alarm.SourceServer</span></td>
+                            <td class="alarm-time" data-utc="@alarm.SyncedAt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="pagination">
+            <div class="pagination-info">
+                Page <strong>@Model.PageNumber</strong> of <strong>@Model.TotalPages</strong>
+            </div>
+            <div class="pagination-buttons">
+                @if (Model.PageNumber > 1)
+                {
+                    <a asp-controller="Reports" asp-action="RedundancyEvents"
+                       asp-route-page="@(Model.PageNumber - 1)"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-search="@filter.Search"
+                       asp-route-priority="@filter.Priority"
+                       asp-route-sourceServer="@filter.SourceServer"
+                       asp-route-startDate="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))"
+                       asp-route-endDate="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))"
+                       class="pagination-btn">Previous</a>
+                }
+
+                @for (var i = 1; i <= Model.TotalPages; i++)
+                {
+                    if (i == Model.PageNumber)
+                    {
+                        <span class="pagination-btn active">@i</span>
+                    }
+                    else if (i == 1 || i == Model.TotalPages || Math.Abs(i - Model.PageNumber) <= 2)
+                    {
+                        <a asp-controller="Reports" asp-action="RedundancyEvents"
+                           asp-route-page="@i"
+                           asp-route-pageSize="@Model.PageSize"
+                           asp-route-search="@filter.Search"
+                           asp-route-priority="@filter.Priority"
+                           asp-route-sourceServer="@filter.SourceServer"
+                           asp-route-startDate="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))"
+                           asp-route-endDate="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))"
+                           class="pagination-btn">@i</a>
+                    }
+                }
+
+                @if (Model.PageNumber < Model.TotalPages)
+                {
+                    <a asp-controller="Reports" asp-action="RedundancyEvents"
+                       asp-route-page="@(Model.PageNumber + 1)"
+                       asp-route-pageSize="@Model.PageSize"
+                       asp-route-search="@filter.Search"
+                       asp-route-priority="@filter.Priority"
+                       asp-route-sourceServer="@filter.SourceServer"
+                       asp-route-startDate="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))"
+                       asp-route-endDate="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))"
+                       class="pagination-btn">Next</a>
+                }
+            </div>
+        </div>
+    }
+</div>

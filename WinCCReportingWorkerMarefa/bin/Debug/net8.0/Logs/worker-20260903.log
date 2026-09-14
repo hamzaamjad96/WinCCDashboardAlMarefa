@@ -1,0 +1,104 @@
+2026-09-03 10:45:45.401 +03:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-09-03 10:45:45.401 +03:00 [INF] WinCC Alarm Reporting Worker started.
+Interval: 90 seconds
+Overlap: 0 seconds
+Initial Fetch: 0 minutes
+Max Alarms: 1000
+2026-09-03 10:45:45.428 +03:00 [INF] Hosting environment: Development
+2026-09-03 10:45:45.429 +03:00 [INF] Content root path: C:\Users\Sabil\source\repos\WinCCCustomDashboardMarefa\WinCCReportingWorkerMarefa
+2026-09-03 10:45:45.715 +03:00 [INF] Fetching WinCC alarms from "2026-09-03T07:13:57.5200000" to "2026-09-03T07:45:45.4290417Z"
+2026-09-03 10:45:45.723 +03:00 [INF] Checking redundancy status using Server1 endpoint: SRV-01
+2026-09-03 10:45:45.799 +03:00 [INF] Sending GraphQL POST request to SRV-01. Endpoint: https://192.168.1.7/graphql/
+2026-09-03 10:45:45.812 +03:00 [INF] Start processing HTTP request POST https://192.168.1.7/graphql/
+2026-09-03 10:45:45.815 +03:00 [INF] Sending HTTP request POST https://192.168.1.7/graphql/
+2026-09-03 10:45:47.991 +03:00 [INF] Received HTTP response headers after 2174.0269ms - 502
+2026-09-03 10:45:47.995 +03:00 [INF] End processing HTTP request after 2188.8577ms - 502
+2026-09-03 10:45:47.998 +03:00 [ERR] GraphQL request failed.
+Server: SRV-01
+URL: https://192.168.1.7/graphql/
+HTTP Status: 502
+Response: <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<title>502 - Web server received an invalid response while acting as a gateway or proxy server.</title>
+<style type="text/css">
+<!--
+body{margin:0;font-size:.7em;font-family:Verdana, Arial, Helvetica, sans-serif;background:#EEEEEE;}
+fieldset{padding:0 15px 10px 15px;} 
+h1{font-size:2.4em;margin:0;color:#FFF;}
+h2{font-size:1.7em;margin:0;color:#CC0000;} 
+h3{font-size:1.2em;margin:10px 0 0 0;color:#000000;} 
+#header{width:96%;margin:0 0 0 0;padding:6px 2% 6px 2%;font-family:"trebuchet MS", Verdana, sans-serif;color:#FFF;
+background-color:#555555;}
+#content{margin:0 0 0 2%;position:relative;}
+.content-container{background:#FFF;width:96%;margin-top:8px;padding:10px;position:relative;}
+-->
+</style>
+</head>
+<body>
+<div id="header"><h1>Server Error</h1></div>
+<div id="content">
+ <div class="content-container"><fieldset>
+  <h2>502 - Web server received an invalid response while acting as a gateway or proxy server.</h2>
+  <h3>There is a problem with the page you are looking for, and it cannot be displayed. When the Web server (while acting as a gateway or proxy) contacted the upstream content server, it received an invalid response from the content server.</h3>
+ </fieldset></div>
+</div>
+</body>
+</html>
+
+2026-09-03 10:45:48.056 +03:00 [WRN] Could not read redundancy status from Server1: SRV-01. Trying Server2: SRV-02.
+System.Net.Http.HttpRequestException: GraphQL request to 'SRV-01' failed. Status: 502 (Bad Gateway). Response: <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+<title>502 - Web server received an invalid response while acting as a gateway or proxy server.</title>
+<style type="text/css">
+<!--
+body{margin:0;font-size:.7em;font-family:Verdana, Arial, Helvetica, sans-serif;background:#EEEEEE;}
+fieldset{padding:0 15px 10px 15px;} 
+h1{font-size:2.4em;margin:0;color:#FFF;}
+h2{font-size:1.7em;margin:0;color:#CC0000;} 
+h3{font-size:1.2em;margin:10px 0 0 0;color:#000000;} 
+#header{width:96%;margin:0 0 0 0;padding:6px 2% 6px 2%;font-family:"trebuchet MS", Verdana, sans-serif;color:#FFF;
+background-color:#555555;}
+#content{margin:0 0 0 2%;position:relative;}
+.content-container{background:#FFF;width:96%;margin-top:8px;padding:10px;position:relative;}
+-->
+</style>
+</head>
+<body>
+<div id="header"><h1>Server Error</h1></div>
+<div id="content">
+ <div class="content-container"><fieldset>
+  <h2>502 - Web server received an invalid response while acting as a gateway or proxy server.</h2>
+  <h3>There is a problem with the page you are looking for, and it cannot be displayed. When the Web server (while acting as a gateway or proxy) contacted the upstream content server, it received an invalid response from the content server.</h3>
+ </fieldset></div>
+</div>
+</body>
+</html>
+
+   at WinCCReportingWorkerMarefa.Services.GraphQLService.ExecuteQueryAsync(WinCCServerOptions server, String query, Object variables, CancellationToken cancellationToken) in C:\Users\Sabil\source\repos\WinCCCustomDashboardMarefa\WinCCReportingWorkerMarefa\Services\GraphQLService.cs:line 108
+   at WinCCReportingWorkerMarefa.Services.RedundancyService.GetActiveServerAsync(CancellationToken cancellationToken) in C:\Users\Sabil\source\repos\WinCCCustomDashboardMarefa\WinCCReportingWorkerMarefa\Services\RedundancyService.cs:line 174
+2026-09-03 10:45:48.086 +03:00 [INF] Sending GraphQL POST request to SRV-02. Endpoint: https://192.168.1.9/graphql/
+2026-09-03 10:45:48.088 +03:00 [INF] Start processing HTTP request POST https://192.168.1.9/graphql/
+2026-09-03 10:45:48.089 +03:00 [INF] Sending HTTP request POST https://192.168.1.9/graphql/
+2026-09-03 10:45:48.122 +03:00 [INF] Received HTTP response headers after 32.6261ms - 200
+2026-09-03 10:45:48.123 +03:00 [INF] End processing HTTP request after 35.8703ms - 200
+2026-09-03 10:45:48.143 +03:00 [INF] WinCC reports current active machine as: SRV-02
+2026-09-03 10:45:48.144 +03:00 [INF] Active WinCC server detected: SRV-02
+2026-09-03 10:45:48.145 +03:00 [INF] Sending GraphQL query to WinCC server: SRV-02
+2026-09-03 10:45:48.150 +03:00 [INF] Sending GraphQL POST request to SRV-02. Endpoint: https://192.168.1.9/graphql/
+2026-09-03 10:45:48.151 +03:00 [INF] Start processing HTTP request POST https://192.168.1.9/graphql/
+2026-09-03 10:45:48.152 +03:00 [INF] Sending HTTP request POST https://192.168.1.9/graphql/
+2026-09-03 10:45:48.184 +03:00 [INF] Received HTTP response headers after 31.6945ms - 200
+2026-09-03 10:45:48.186 +03:00 [INF] End processing HTTP request after 34.5325ms - 200
+2026-09-03 10:45:48.187 +03:00 [INF] Successfully received GraphQL response from: SRV-02
+2026-09-03 10:45:48.188 +03:00 [INF] GraphQL response received from SRV-02
+2026-09-03 10:45:48.223 +03:00 [INF] Received 0 alarms from WinCC.
+2026-09-03 10:45:48.260 +03:00 [INF] WinCC alarm synchronization completed.
+Server: SRV-02
+Received: 0
+Inserted: 0
+Duplicates: 0
+2026-09-03 10:45:48.262 +03:00 [INF] Waiting 90 seconds before next synchronization.

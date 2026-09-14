@@ -1,0 +1,95 @@
+﻿@{
+    var selected = ViewBag.SelectedReport as string ?? "AlarmHistory";
+
+    string Active(string name) =>
+        string.Equals(selected, name, StringComparison.OrdinalIgnoreCase)
+            ? "report-card active"
+            : "report-card";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Report Type</h2>
+            <span class="card-description">
+                Select the report you want to view or generate
+            </span>
+        </div>
+    </div>
+
+    <div class="reports-grid">
+
+        <a asp-controller="Reports" asp-action="Index"
+           class="@Active("AlarmHistory")">
+            <div class="report-icon">📋</div>
+            <div class="report-content">
+                <h3>Alarm History</h3>
+                <p>Complete alarm event history with filters, pagination and PDF export.</p>
+            </div>
+        </a>
+
+        <a asp-controller="Reports" asp-action="DailySummary"
+           class="@Active("DailySummary")">
+            <div class="report-icon">📅</div>
+            <div class="report-content">
+                <h3>Daily Alarm Summary</h3>
+                <p>Daily alarm counts and priority distribution.</p>
+            </div>
+        </a>
+
+        <a asp-controller="Reports" asp-action="HourlyAnalysis"
+           class="@Active("HourlyAnalysis")">
+            <div class="report-icon">🕐</div>
+            <div class="report-content">
+                <h3>Hourly Alarm Analysis</h3>
+                <p>Analyze alarm activity by hour of day.</p>
+            </div>
+        </a>
+
+        <a asp-controller="Reports" asp-action="TopAlarms"
+           class="@Active("TopAlarms")">
+            <div class="report-icon">🔝</div>
+            <div class="report-content">
+                <h3>Top Alarms</h3>
+                <p>Identify the most frequently occurring alarms.</p>
+            </div>
+        </a>
+
+        <a asp-controller="Reports" asp-action="PriorityAnalysis"
+           class="@Active("PriorityAnalysis")">
+            <div class="report-icon">⚠️</div>
+            <div class="report-content">
+                <h3>Priority Analysis</h3>
+                <p>Analyze alarms according to their priority.</p>
+            </div>
+        </a>
+
+        <a asp-controller="Reports" asp-action="ServerAnalysis"
+           class="@Active("ServerAnalysis")">
+            <div class="report-icon">🖥️</div>
+            <div class="report-content">
+                <h3>Server Analysis</h3>
+                <p>Compare alarm activity between servers.</p>
+            </div>
+        </a>
+
+        <a asp-controller="Reports" asp-action="RedundancyEvents"
+           class="@Active("RedundancyEvents")">
+            <div class="report-icon">🔄</div>
+            <div class="report-content">
+                <h3>Redundancy Events</h3>
+                <p>Analyze redundancy and failover related events.</p>
+            </div>
+        </a>
+
+        <a asp-controller="Reports" asp-action="SystemEvents"
+           class="@Active("SystemEvents")">
+            <div class="report-icon">⚙️</div>
+            <div class="report-content">
+                <h3>System / Connection Events</h3>
+                <p>Analyze system, connection and communication events.</p>
+            </div>
+        </a>
+
+    </div>
+</div>

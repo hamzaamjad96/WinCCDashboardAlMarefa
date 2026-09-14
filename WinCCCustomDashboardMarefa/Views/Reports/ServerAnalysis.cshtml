@@ -1,0 +1,108 @@
+﻿@model List<WinCCCustomDashboardMarefa.Models.ServerAnalysis>
+
+@{
+    ViewData["Title"] = "Server Analysis";
+    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
+                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+    long grandTotal = Model.Sum(x => x.TotalCount);
+}
+
+<div class="page-header">
+    <div>
+        <h1>Server Analysis</h1>
+        <p class="page-subtitle">Alarm activity per source server</p>
+    </div>
+</div>
+
+@await Html.PartialAsync("_ReportsNav")
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Filters</h2>
+            <span class="card-description">Filter server analysis</span>
+        </div>
+    </div>
+
+    <form asp-controller="Reports" asp-action="ServerAnalysis" method="get" class="report-filters">
+
+        <div class="filter-group">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+                <option value="">All Priorities</option>
+                <option value="0" selected="@(filter.Priority == 0 ? "selected" : null)">0</option>
+                <option value="1" selected="@(filter.Priority == 1 ? "selected" : null)">1</option>
+                <option value="4" selected="@(filter.Priority == 4 ? "selected" : null)">4</option>
+                <option value="12" selected="@(filter.Priority == 12 ? "selected" : null)">12</option>
+                <option value="16" selected="@(filter.Priority == 16 ? "selected" : null)">16</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="startDate">From</label>
+            <input type="datetime-local" id="startDate" name="startDate"
+                   value="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-group">
+            <label for="endDate">To</label>
+            <input type="datetime-local" id="endDate" name="endDate"
+                   value="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a asp-controller="Reports" asp-action="ServerAnalysis" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Server Comparison</h2>
+            <span class="card-description">Total: @grandTotal alarms</span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Server</th>
+                    <th>Total</th>
+                    <th>High Priority</th>
+                    <th>Priority 1</th>
+                    <th>Priority 4</th>
+                    <th>Priority 12</th>
+                    <th>First Occurrence</th>
+                    <th>Last Occurrence</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="empty-state">No data found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="server-badge">@item.SourceServer</span></td>
+                            <td><strong>@item.TotalCount</strong></td>
+                            <td><span class="priority-badge">@item.HighPriorityCount</span></td>
+                            <td>@item.Priority1Count</td>
+                            <td>@item.Priority4Count</td>
+                            <td>@item.Priority12Count</td>
+                            <td class="alarm-time" data-utc="@item.FirstOccurrence.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"></td>
+                            <td class="alarm-time" data-utc="@item.LastOccurrence.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

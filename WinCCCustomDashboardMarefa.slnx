@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="WinCCCustomDashboardMarefa/WinCCCustomDashboardMarefa.csproj" />
+  <Project Path="WinCCReportingWorkerMarefa/WinCCReportingWorkerMarefa.csproj" Id="3b1098f2-f6e5-4d9e-9abe-4a98553f38c0" />
+</Solution>

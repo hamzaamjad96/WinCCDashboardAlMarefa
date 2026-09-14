@@ -1,0 +1,115 @@
+﻿@model List<WinCCCustomDashboardMarefa.Models.PriorityAnalysis>
+
+@{
+    ViewData["Title"] = "Priority Analysis";
+    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
+                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+    long grandTotal = Model.Sum(x => x.TotalCount);
+}
+
+<div class="page-header">
+    <div>
+        <h1>Priority Analysis</h1>
+        <p class="page-subtitle">Distribution of alarms by priority</p>
+    </div>
+</div>
+
+@await Html.PartialAsync("_ReportsNav")
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Filters</h2>
+            <span class="card-description">Filter priority analysis</span>
+        </div>
+    </div>
+
+    <form asp-controller="Reports" asp-action="PriorityAnalysis" method="get" class="report-filters">
+
+        <div class="filter-group">
+            <label for="sourceServer">Source Server</label>
+            <select id="sourceServer" name="sourceServer">
+                <option value="">All Servers</option>
+                <option value="SRV-01" selected="@(filter.SourceServer == "SRV-01" ? "selected" : null)">SRV-01</option>
+                <option value="SRV-02" selected="@(filter.SourceServer == "SRV-02" ? "selected" : null)">SRV-02</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="startDate">From</label>
+            <input type="datetime-local" id="startDate" name="startDate"
+                   value="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-group">
+            <label for="endDate">To</label>
+            <input type="datetime-local" id="endDate" name="endDate"
+                   value="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a asp-controller="Reports" asp-action="PriorityAnalysis" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Priority Distribution</h2>
+            <span class="card-description">Total: @grandTotal alarms</span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Priority</th>
+                    <th>Share</th>
+                    <th>Total Count</th>
+                    <th>Percentage</th>
+                    <th>SRV-01</th>
+                    <th>SRV-02</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="empty-state">No data found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        var pct = (int)item.Percentage;
+                        <tr>
+                            <td>
+                                @if (item.Priority.HasValue)
+                                {
+                                    <span class="priority-badge">@item.Priority</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Unclassified</span>
+                                }
+                            </td>
+                            <td style="min-width:200px;">
+                                <div style="background:#e5e7eb;border-radius:4px;height:14px;overflow:hidden;">
+                                    <div style="background:#dc2626;height:100%;width:@(pct)%;"></div>
+                                </div>
+                            </td>
+                            <td><strong>@item.TotalCount</strong></td>
+                            <td>@item.Percentage.ToString("0.00")%</td>
+                            <td><span class="server-badge">@item.Srv01Count</span></td>
+                            <td><span class="server-badge">@item.Srv02Count</span></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

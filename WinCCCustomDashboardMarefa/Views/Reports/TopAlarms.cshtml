@@ -1,0 +1,133 @@
+﻿@model List<WinCCCustomDashboardMarefa.Models.TopAlarm>
+
+@{
+    ViewData["Title"] = "Top Alarms";
+    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
+                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+    var rank = 1;
+}
+
+<div class="page-header">
+    <div>
+        <h1>Top Alarms</h1>
+        <p class="page-subtitle">Most frequently occurring alarms</p>
+    </div>
+</div>
+
+@await Html.PartialAsync("_ReportsNav")
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Filters</h2>
+            <span class="card-description">Filter top alarms</span>
+        </div>
+    </div>
+
+    <form asp-controller="Reports" asp-action="TopAlarms" method="get" class="report-filters">
+
+        <div class="filter-group">
+            <label for="topN">Top N</label>
+            <select id="topN" name="topN">
+                @foreach (var n in new[] { 10, 20, 50, 100 })
+                {
+                    <option value="@n" selected="@(filter.TopN == n ? "selected" : null)">Top @n</option>
+                }
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+                <option value="">All Priorities</option>
+                <option value="0" selected="@(filter.Priority == 0 ? "selected" : null)">0</option>
+                <option value="1" selected="@(filter.Priority == 1 ? "selected" : null)">1</option>
+                <option value="4" selected="@(filter.Priority == 4 ? "selected" : null)">4</option>
+                <option value="12" selected="@(filter.Priority == 12 ? "selected" : null)">12</option>
+                <option value="16" selected="@(filter.Priority == 16 ? "selected" : null)">16</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="sourceServer">Source Server</label>
+            <select id="sourceServer" name="sourceServer">
+                <option value="">All Servers</option>
+                <option value="SRV-01" selected="@(filter.SourceServer == "SRV-01" ? "selected" : null)">SRV-01</option>
+                <option value="SRV-02" selected="@(filter.SourceServer == "SRV-02" ? "selected" : null)">SRV-02</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="startDate">From</label>
+            <input type="datetime-local" id="startDate" name="startDate"
+                   value="@(filter.StartDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-group">
+            <label for="endDate">To</label>
+            <input type="datetime-local" id="endDate" name="endDate"
+                   value="@(filter.EndDate?.ToString("yyyy-MM-ddTHH:mm"))" />
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a asp-controller="Reports" asp-action="TopAlarms" class="btn btn-secondary">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div>
+            <h2>Top Alarms</h2>
+            <span class="card-description">Ranked by occurrence count</span>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Alarm Name</th>
+                    <th>Priority</th>
+                    <th>Count</th>
+                    <th>First Occurrence</th>
+                    <th>Last Occurrence</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="empty-state">No data found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@rank</strong></td>
+                            <td><span class="alarm-name">@item.AlarmName</span></td>
+                            <td>
+                                @if (item.Priority.HasValue)
+                                {
+                                    <span class="priority-badge">@item.Priority</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td><strong>@item.TotalCount</strong></td>
+                            <td class="alarm-time" data-utc="@item.FirstOccurrence.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"></td>
+                            <td class="alarm-time" data-utc="@item.LastOccurrence.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")"></td>
+                        </tr>
+                        rank++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

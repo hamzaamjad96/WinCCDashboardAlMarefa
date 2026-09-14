@@ -1,0 +1,197 @@
+﻿@model WinCCCustomDashboardMarefa.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var summary = Model.Summary;
+    var alarms = Model.RecentAlarms;
+    var syncStatus = Model.SyncStatus;
+}
+
+<!-- STAT CARDS -->
+
+<div class="dashboard-cards">
+
+    <div class="card">
+        <div class="card-label">
+            Total Alarms
+        </div>
+
+        <div class="card-value">
+            @summary.TotalAlarms
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-label">
+            Today's Alarms
+        </div>
+
+        <div class="card-value">
+            @summary.TodayAlarms
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-label">
+            High Priority
+        </div>
+
+        <div class="card-value">
+            @summary.HighPriorityAlarms
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="card-label">
+            Active Server
+        </div>
+
+        <div class="card-value">
+            @summary.ActiveServer
+        </div>
+    </div>
+
+</div>
+
+
+<!-- LATEST ALARMS -->
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div class="panel-title">
+            Latest Alarms
+        </div>
+
+        <div>
+            @alarms.Count records
+        </div>
+
+    </div>
+
+    <div class="panel-body">
+
+        <table class="table">
+
+            <thead>
+                <tr>
+                    <th>Alarm</th>
+                    <th>Priority</th>
+                    <th>Raise Time</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (alarms.Count == 0)
+                {
+                    <tr>
+                        <td colspan="4">
+                            No alarms found.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var alarm in alarms)
+                    {
+                        <tr>
+
+                            <td>
+                                @alarm.AlarmName
+                            </td>
+
+                            <td>
+                                @(alarm.Priority?.ToString() ?? "-")
+                            </td>
+
+                            <td class="alarm-time"
+                                data-utc="@alarm.RaiseTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")">
+                            </td>
+
+                            <td>
+                                @alarm.SourceServer
+                            </td>
+
+                        </tr>
+                    }
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- SYNC STATUS -->
+
+<div class="panel" style="margin-top:20px;">
+
+    <div class="panel-header">
+        <div class="panel-title">
+            Synchronization Status
+        </div>
+    </div>
+
+    <div class="panel-body">
+
+        <table class="table">
+
+            <tbody>
+
+                <tr>
+                    <td>Sync Name</td>
+                    <td>
+                        @(syncStatus?.SyncName ?? "N/A")
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Status</td>
+                    <td>
+                        @(syncStatus?.LastStatus ?? "N/A")
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Source Server</td>
+                    <td>
+                        @(syncStatus?.LastSourceServer ?? "N/A")
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Last Successful Fetch</td>
+                    <td>
+                        @(syncStatus?.LastSuccessfulFetchTime?
+                            .ToLocalTime()
+                            .ToString("dd-MMM-yyyy HH:mm:ss")
+                          ?? "N/A")
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Last Completed</td>
+                    <td>
+                        @(syncStatus?.LastFetchCompletedAt?
+                            .ToLocalTime()
+                            .ToString("dd-MMM-yyyy HH:mm:ss")
+                          ?? "N/A")
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
