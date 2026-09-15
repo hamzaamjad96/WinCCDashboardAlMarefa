@@ -6,52 +6,81 @@
     var summary = Model.Summary;
     var alarms = Model.RecentAlarms;
     var syncStatus = Model.SyncStatus;
+    var trendDays = (int)(ViewBag.TrendDays ?? 7);
+
+    var trendLabels = Model.AlarmTrend
+        .Select(x => x.Date.ToString("dd MMM")).ToList();
+    var trendValues = Model.AlarmTrend.Select(x => x.Count).ToList();
+
+    var priorityLabels = Model.AlarmsByPriority
+        .Select(x => string.IsNullOrEmpty(x.Name) ? "None" : x.Name).ToList();
+    var priorityValues = Model.AlarmsByPriority.Select(x => x.Count).ToList();
+
+    var serverLabels = Model.AlarmsByServer.Select(x => x.Name).ToList();
+    var serverValues = Model.AlarmsByServer.Select(x => x.Count).ToList();
 }
 
 <!-- STAT CARDS -->
-
 <div class="dashboard-cards">
 
     <div class="card">
-        <div class="card-label">
-            Total Alarms
-        </div>
+        <div class="card-label">Total Alarms</div>
+        <div class="card-value">@summary.TotalAlarms</div>
+    </div>
 
-        <div class="card-value">
-            @summary.TotalAlarms
+    <div class="card">
+        <div class="card-label">Today's Alarms</div>
+        <div class="card-value">@summary.TodayAlarms</div>
+    </div>
+
+    <div class="card">
+        <div class="card-label">High Priority</div>
+        <div class="card-value">@summary.HighPriorityAlarms</div>
+    </div>
+
+    <div class="card">
+        <div class="card-label">Active Server</div>
+        <div class="card-value">@summary.ActiveServer</div>
+    </div>
+
+</div>
+
+
+<!-- CHARTS -->
+<div class="charts-grid">
+
+    <div class="panel chart-panel-wide">
+        <div class="panel-header">
+            <div class="panel-title">Alarm Trend (last @trendDays days)</div>
+            <div class="chart-range">
+                <a asp-action="Index" asp-route-trendDays="7"
+                   class="range-btn @(trendDays == 7 ? "active" : "")">7d</a>
+                <a asp-action="Index" asp-route-trendDays="30"
+                   class="range-btn @(trendDays == 30 ? "active" : "")">30d</a>
+                <a asp-action="Index" asp-route-trendDays="90"
+                   class="range-btn @(trendDays == 90 ? "active" : "")">90d</a>
+            </div>
+        </div>
+        <div class="panel-body chart-body">
+            <canvas id="alarmTrendChart"></canvas>
         </div>
     </div>
 
-
-    <div class="card">
-        <div class="card-label">
-            Today's Alarms
+    <div class="panel chart-panel">
+        <div class="panel-header">
+            <div class="panel-title">Alarms by Priority</div>
         </div>
-
-        <div class="card-value">
-            @summary.TodayAlarms
+        <div class="panel-body chart-body">
+            <canvas id="priorityChart"></canvas>
         </div>
     </div>
 
-
-    <div class="card">
-        <div class="card-label">
-            High Priority
+    <div class="panel chart-panel">
+        <div class="panel-header">
+            <div class="panel-title">Alarms by Server</div>
         </div>
-
-        <div class="card-value">
-            @summary.HighPriorityAlarms
-        </div>
-    </div>
-
-
-    <div class="card">
-        <div class="card-label">
-            Active Server
-        </div>
-
-        <div class="card-value">
-            @summary.ActiveServer
+        <div class="panel-body chart-body">
+            <canvas id="serverChart"></canvas>
         </div>
     </div>
 
@@ -59,25 +88,13 @@
 
 
 <!-- LATEST ALARMS -->
-
 <div class="panel">
-
     <div class="panel-header">
-
-        <div class="panel-title">
-            Latest Alarms
-        </div>
-
-        <div>
-            @alarms.Count records
-        </div>
-
+        <div class="panel-title">Latest Alarms</div>
+        <div>@alarms.Count records</div>
     </div>
-
     <div class="panel-body">
-
         <table class="table">
-
             <thead>
                 <tr>
                     <th>Alarm</th>
@@ -86,112 +103,183 @@
                     <th>Source</th>
                 </tr>
             </thead>
-
             <tbody>
-
                 @if (alarms.Count == 0)
                 {
-                    <tr>
-                        <td colspan="4">
-                            No alarms found.
-                        </td>
-                    </tr>
+                    <tr><td colspan="4">No alarms found.</td></tr>
                 }
                 else
                 {
                     foreach (var alarm in alarms)
                     {
                         <tr>
-
-                            <td>
-                                @alarm.AlarmName
-                            </td>
-
-                            <td>
-                                @(alarm.Priority?.ToString() ?? "-")
-                            </td>
-
+                            <td>@alarm.AlarmName</td>
+                            <td>@(alarm.Priority?.ToString() ?? "-")</td>
                             <td class="alarm-time"
                                 data-utc="@alarm.RaiseTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")">
                             </td>
-
-                            <td>
-                                @alarm.SourceServer
-                            </td>
-
+                            <td>@alarm.SourceServer</td>
                         </tr>
                     }
                 }
-
             </tbody>
-
         </table>
-
     </div>
-
 </div>
 
+
 <!-- SYNC STATUS -->
-
 <div class="panel" style="margin-top:20px;">
-
     <div class="panel-header">
-        <div class="panel-title">
-            Synchronization Status
-        </div>
+        <div class="panel-title">Synchronization Status</div>
     </div>
-
     <div class="panel-body">
-
         <table class="table">
-
             <tbody>
-
                 <tr>
                     <td>Sync Name</td>
-                    <td>
-                        @(syncStatus?.SyncName ?? "N/A")
-                    </td>
+                    <td>@(syncStatus?.SyncName ?? "N/A")</td>
                 </tr>
-
                 <tr>
                     <td>Status</td>
-                    <td>
-                        @(syncStatus?.LastStatus ?? "N/A")
-                    </td>
+                    <td>@(syncStatus?.LastStatus ?? "N/A")</td>
                 </tr>
-
                 <tr>
                     <td>Source Server</td>
-                    <td>
-                        @(syncStatus?.LastSourceServer ?? "N/A")
-                    </td>
+                    <td>@(syncStatus?.LastSourceServer ?? "N/A")</td>
                 </tr>
-
                 <tr>
                     <td>Last Successful Fetch</td>
                     <td>
                         @(syncStatus?.LastSuccessfulFetchTime?
                             .ToLocalTime()
-                            .ToString("dd-MMM-yyyy HH:mm:ss")
-                          ?? "N/A")
+                            .ToString("dd-MMM-yyyy HH:mm:ss") ?? "N/A")
                     </td>
                 </tr>
-
                 <tr>
                     <td>Last Completed</td>
                     <td>
                         @(syncStatus?.LastFetchCompletedAt?
                             .ToLocalTime()
-                            .ToString("dd-MMM-yyyy HH:mm:ss")
-                          ?? "N/A")
+                            .ToString("dd-MMM-yyyy HH:mm:ss") ?? "N/A")
                     </td>
                 </tr>
-
             </tbody>
-
         </table>
-
     </div>
-
 </div>
+
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+        Chart.defaults.font.family = "Segoe UI, Arial, sans-serif";
+        Chart.defaults.color = "#4b5563";
+
+        // ---------- 1. Trend (Line) ----------
+        const trendEl = document.getElementById("alarmTrendChart");
+        if (trendEl) {
+        new Chart(trendEl, {
+        type: "line",
+        data: {
+        labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(trendLabels)),
+        datasets: [{
+        label: "Alarms",
+        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(trendValues)),
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37, 99, 235, 0.12)",
+        borderWidth: 2,
+        fill: true,
+        tension: 0.35,
+        pointRadius: 4,
+        pointBackgroundColor: "#2563eb"
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+        legend: { display: false },
+        tooltip: { mode: "index", intersect: false }
+        },
+        scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } },
+        x: { grid: { display: false } }
+        }
+        }
+        });
+        }
+
+        // ---------- 2. Priority (Doughnut) ----------
+        const priorityEl = document.getElementById("priorityChart");
+        if (priorityEl) {
+        new Chart(priorityEl, {
+        type: "doughnut",
+        data: {
+        labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(priorityLabels)),
+        datasets: [{
+        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(priorityValues)),
+        backgroundColor: [
+        "#dc2626", "#f97316", "#facc15",
+        "#22c55e", "#06b6d4", "#8b5cf6", "#6b7280"
+        ],
+        borderWidth: 2,
+        borderColor: "#ffffff"
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+        legend: {
+        position: "bottom",
+        labels: { boxWidth: 12 }
+        }
+        },
+        cutout: "60%"
+        }
+        });
+        }
+
+        // ---------- 3. Server (Bar) ----------
+        const serverEl = document.getElementById("serverChart");
+        if (serverEl) {
+        new Chart(serverEl, {
+        type: "bar",
+        data: {
+        labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(serverLabels)),
+        datasets: [{
+        label: "Alarms",
+        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(serverValues)),
+        backgroundColor: ["#2563eb", "#7c3aed", "#0891b2"],
+        borderRadius: 6,
+        barThickness: 40
+        }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } },
+        x: { grid: { display: false } }
+        }
+        }
+        });
+        }
+
+        // ---------- UTC → local time ----------
+        document.querySelectorAll(".alarm-time").forEach(function (el) {
+        const utc = el.dataset.utc;
+        if (!utc) return;
+        const d = new Date(utc);
+        if (!isNaN(d.getTime())) el.textContent = d.toLocaleString();
+        });
+
+        });
+    </script>
+}

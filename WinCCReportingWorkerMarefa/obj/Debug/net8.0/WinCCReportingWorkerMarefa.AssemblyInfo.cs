@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WinCCReportingWorkerMarefa")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e6afef10b8ed00a7440d15c7ecf90cbed7c45ab1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+705a7fd007c3c0f8b8415c54b2061f04ab9e86af")]
 [assembly: System.Reflection.AssemblyProductAttribute("WinCCReportingWorkerMarefa")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WinCCReportingWorkerMarefa")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

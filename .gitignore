@@ -1,0 +1,49 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+*.trx
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# ASP.NET generated files
+wwwroot/lib/
+wwwroot/dist/
+
+# Publish output
+publish/
+PublishProfiles/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / local configuration
+appsettings.Development.json
+appsettings.Local.json
+
+# Secrets
+secrets.json
+
+# User-specific launch settings
+Properties/launchSettings.json
