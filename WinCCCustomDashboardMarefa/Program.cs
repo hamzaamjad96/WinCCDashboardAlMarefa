@@ -4,7 +4,7 @@ using WinCCCustomDashboardMarefa.Pdf;
 using WinCCCustomDashboardMarefa.Services;
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-GlobalFontSettings.UseWindowsFontsUnderWindows = true;
+GlobalFontSettings.FontResolver = new WindowsFontResolver();
 
 var builder = WebApplication.CreateBuilder(args);
 
