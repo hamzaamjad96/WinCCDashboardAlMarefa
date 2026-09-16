@@ -1,4 +1,9 @@
 <Solution>
-  <Project Path="WinCCCustomDashboardMarefa/WinCCCustomDashboardMarefa.csproj" />
-  <Project Path="WinCCReportingWorkerMarefa/WinCCReportingWorkerMarefa.csproj" Id="3b1098f2-f6e5-4d9e-9abe-4a98553f38c0" />
+  <Folder Name="/src/">
+    <Project Path="src/WinCCDashboard.Web/WinCCDashboard.Web.csproj" />
+    <Project Path="src/WinCCDashboard.Worker/WinCCDashboard.Worker.csproj" />
+    <Project Path="src/WinCCDashboard.Domain/WinCCDashboard.Domain.csproj" />
+    <Project Path="src/WinCCDashboard.Application/WinCCDashboard.Application.csproj" />
+    <Project Path="src/WinCCDashboard.Infrastructure/WinCCDashboard.Infrastructure.csproj" />
+  </Folder>
 </Solution>
