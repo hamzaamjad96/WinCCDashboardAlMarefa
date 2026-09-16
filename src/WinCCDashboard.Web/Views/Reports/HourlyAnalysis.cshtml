@@ -1,10 +1,10 @@
-﻿@model List<WinCCCustomDashboardMarefa.Models.HourlyAnalysis>
+@model List<WinCCDashboard.Web.ViewModels.Reports.HourlyAnalysis>
 
 @{
     ViewData["Title"] = "Hourly Alarm Analysis";
 
-    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
-                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+    var filter = ViewBag.Filter as WinCCDashboard.Domain.Entities.AlarmReportFilter
+                 ?? new WinCCDashboard.Domain.Entities.AlarmReportFilter();
 
     var maxCount = Model.Count > 0 ? Model.Max(x => x.TotalAlarms) : 0;
     long grandTotal = Model.Sum(x => x.TotalAlarms);
@@ -133,3 +133,4 @@
         </table>
     </div>
 </div>
+

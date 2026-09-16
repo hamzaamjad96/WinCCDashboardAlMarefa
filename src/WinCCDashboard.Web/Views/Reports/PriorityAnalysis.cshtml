@@ -1,9 +1,9 @@
-﻿@model List<WinCCCustomDashboardMarefa.Models.PriorityAnalysis>
+@model List<WinCCDashboard.Web.ViewModels.Reports.PriorityAnalysis>
 
 @{
     ViewData["Title"] = "Priority Analysis";
-    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
-                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+    var filter = ViewBag.Filter as WinCCDashboard.Domain.Entities.AlarmReportFilter
+                 ?? new WinCCDashboard.Domain.Entities.AlarmReportFilter();
     long grandTotal = Model.Sum(x => x.TotalCount);
 }
 
@@ -113,3 +113,4 @@
         </table>
     </div>
 </div>
+

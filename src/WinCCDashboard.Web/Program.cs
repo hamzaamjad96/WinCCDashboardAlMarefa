@@ -1,20 +1,20 @@
-using PdfSharp.Fonts;
+using QuestPDF.Infrastructure;
 using System.Text;
-using WinCCCustomDashboardMarefa.Pdf;
-using WinCCCustomDashboardMarefa.Services;
+using WinCCDashboard.Application;
+using WinCCDashboard.Infrastructure;
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-GlobalFontSettings.FontResolver = new WindowsFontResolver();
+
+// QuestPDF community license
+QuestPDF.Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<AlarmService>();
-builder.Services.AddScoped<DashboardService>();
-builder.Services.AddScoped<ReportsService>();
-builder.Services.AddScoped<AlarmHistoryPdfService>();
-builder.Services.AddScoped<DailyAlarmSummaryPdfService>();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 

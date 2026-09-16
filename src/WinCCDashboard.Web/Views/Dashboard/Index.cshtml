@@ -1,4 +1,4 @@
-﻿@model WinCCCustomDashboardMarefa.Models.DashboardViewModel
+@model WinCCDashboard.Web.ViewModels.Dashboard.DashboardViewModel
 
 @{
     ViewData["Title"] = "Dashboard";
@@ -272,7 +272,7 @@
         });
         }
 
-        // ---------- UTC → local time ----------
+        // ---------- UTC ? local time ----------
         document.querySelectorAll(".alarm-time").forEach(function (el) {
         const utc = el.dataset.utc;
         if (!utc) return;

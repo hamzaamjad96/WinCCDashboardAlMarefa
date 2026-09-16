@@ -1,8 +1,8 @@
-﻿@model WinCCDashboard.Domain.Common.PagedResult<WinCCCustomDashboardMarefa.Models.AlarmEvent>
+@model WinCCDashboard.Domain.Common.PagedResult<WinCCDashboard.Domain.Entities.AlarmEvent>
 @{
     ViewData["Title"] = "Redundancy Events";
-    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
-                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+    var filter = ViewBag.Filter as WinCCDashboard.Domain.Entities.AlarmReportFilter
+                 ?? new WinCCDashboard.Domain.Entities.AlarmReportFilter();
 
     var firstRecord = Model.TotalCount == 0 ? 0
         : ((Model.PageNumber - 1) * Model.PageSize) + 1;
@@ -212,3 +212,4 @@
         </div>
     }
 </div>
+

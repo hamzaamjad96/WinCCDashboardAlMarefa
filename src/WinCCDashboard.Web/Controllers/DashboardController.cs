@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WinCCCustomDashboardMarefa.Services;
+using WinCCDashboard.Application.Dashboard;
+using WinCCDashboard.Web.ViewModels.Dashboard;
 
 namespace WinCCCustomDashboardMarefa.Controllers;
 
 public class DashboardController : Controller
 {
-    private readonly DashboardService _dashboardService;
+    private readonly DashboardQueryService _dashboardService;
 
-    public DashboardController(DashboardService dashboardService)
+    public DashboardController(DashboardQueryService dashboardService)
     {
         _dashboardService = dashboardService;
     }
@@ -16,15 +17,20 @@ public class DashboardController : Controller
         int trendDays = 7,
         CancellationToken cancellationToken = default)
     {
-        if (trendDays < 1) trendDays = 7;
-        if (trendDays > 90) trendDays = 90;
+        var data = await _dashboardService.GetDashboardAsync(
+            trendDays, cancellationToken);
 
-        var model = await _dashboardService.GetDashboardDataAsync(
-            trendDays,
-            cancellationToken);
+        var model = new DashboardViewModel
+        {
+            Summary = data.Summary,
+            RecentAlarms = data.RecentAlarms,
+            SyncStatus = data.SyncStatus,
+            AlarmTrend = data.AlarmTrend,
+            AlarmsByPriority = data.AlarmsByPriority,
+            AlarmsByServer = data.AlarmsByServer
+        };
 
         ViewBag.TrendDays = trendDays;
-
         return View(model);
     }
 }

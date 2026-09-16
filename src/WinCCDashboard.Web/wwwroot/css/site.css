@@ -4,7 +4,7 @@ html {
 
 body {
     margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", "Segoe UI Symbol", "Segoe UI Emoji", Arial, sans-serif;
     background: #f5f7fa;
     color: #1f2937;
 }
@@ -169,9 +169,18 @@ body {
     }
 
 .menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 20px;
-    text-align: center;
+    min-width: 20px;
+    color: currentColor;
 }
+
+    .menu-icon svg {
+        width: 16px;
+        height: 16px;
+    }
 
 /* =========================
    MAIN AREA
@@ -628,5 +637,28 @@ body {
         .charts-grid {
             grid-template-columns: 1fr;
         }
+    }
+
+    .report-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        border-radius: 8px;
+        background: #eff6ff;
+        color: #2563eb;
+        flex-shrink: 0;
+    }
+
+        .report-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+    .report-card.active .report-icon {
+        background: #2563eb;
+        color: #ffffff;
     }
 }

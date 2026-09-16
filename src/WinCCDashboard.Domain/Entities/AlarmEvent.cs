@@ -1,4 +1,4 @@
-﻿namespace WinCCCustomDashboardMarefa.Models;
+﻿namespace WinCCDashboard.Domain.Entities;
 
 public class AlarmEvent
 {

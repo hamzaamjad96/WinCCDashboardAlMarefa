@@ -1,10 +1,10 @@
-﻿@model WinCCDashboard.Domain.Common.PagedResult<WinCCCustomDashboardMarefa.Models.DailyAlarmSummary>
+@model WinCCDashboard.Domain.Common.PagedResult<WinCCDashboard.Domain.Entities.DailyAlarmSummary>
 @{
     ViewData["Title"] = "Daily Alarm Summary";
 
     var filter =
-        ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
-        ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+        ViewBag.Filter as WinCCDashboard.Domain.Entities.AlarmReportFilter
+        ?? new WinCCDashboard.Domain.Entities.AlarmReportFilter();
 
     var firstRecord =
         Model.TotalCount == 0
@@ -433,3 +433,4 @@
     }
 
 </div>
+

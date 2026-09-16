@@ -1,4 +1,4 @@
-﻿namespace WinCCCustomDashboardMarefa.Models;
+﻿namespace WinCCDashboard.Web.ViewModels.Reports;
 
 public class HourlyAnalysis
 {

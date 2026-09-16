@@ -1,9 +1,9 @@
-﻿@model List<WinCCCustomDashboardMarefa.Models.TopAlarm>
+@model List<WinCCDashboard.Web.ViewModels.Reports.TopAlarm>
 
 @{
     ViewData["Title"] = "Top Alarms";
-    var filter = ViewBag.Filter as WinCCCustomDashboardMarefa.Models.AlarmReportFilter
-                 ?? new WinCCCustomDashboardMarefa.Models.AlarmReportFilter();
+    var filter = ViewBag.Filter as WinCCDashboard.Domain.Entities.AlarmReportFilter
+                 ?? new WinCCDashboard.Domain.Entities.AlarmReportFilter();
     var rank = 1;
 }
 
@@ -131,3 +131,4 @@
         </table>
     </div>
 </div>
+

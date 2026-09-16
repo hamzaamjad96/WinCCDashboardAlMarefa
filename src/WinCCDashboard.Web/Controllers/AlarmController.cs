@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WinCCCustomDashboardMarefa.Services;
+using WinCCDashboard.Application.Alarms;
 
 namespace WinCCCustomDashboardMarefa.Controllers;
 
 public class AlarmController : Controller
 {
-    private readonly AlarmService _alarmService;
+    private readonly AlarmQueryService _alarmService;
 
-    public AlarmController(AlarmService alarmService)
+    public AlarmController(AlarmQueryService alarmService)
     {
         _alarmService = alarmService;
     }
@@ -22,25 +22,9 @@ public class AlarmController : Controller
         DateTime? endDate = null,
         CancellationToken cancellationToken = default)
     {
-        if (page < 1)
-            page = 1;
-
-        if (pageSize < 10)
-            pageSize = 50;
-
-        if (pageSize > 500)
-            pageSize = 500;
-
-        var result =
-            await _alarmService.GetAlarmsAsync(
-                page,
-                pageSize,
-                search,
-                priority,
-                sourceServer,
-                startDate,
-                endDate,
-                cancellationToken);
+        var result = await _alarmService.GetAlarmsAsync(
+            page, pageSize, search, priority,
+            sourceServer, startDate, endDate, cancellationToken);
 
         return View(result);
     }

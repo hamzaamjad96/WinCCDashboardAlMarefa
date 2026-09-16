@@ -1,4 +1,4 @@
-﻿namespace WinCCCustomDashboardMarefa.Models;
+﻿namespace WinCCDashboard.Domain.Entities;
 
 public class AlarmReportFilter
 {
@@ -7,8 +7,8 @@ public class AlarmReportFilter
     public string? SourceServer { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
-    public string? Category { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 50;
     public int TopN { get; set; } = 20;
+    public string? Category { get; set; }
 }
