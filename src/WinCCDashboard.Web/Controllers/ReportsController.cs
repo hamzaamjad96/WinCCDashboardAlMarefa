@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WinCCDashboard.Application.Abstractions.Pdf;
+using WinCCDashboard.Application.Abstractions.Reporting;
 using WinCCDashboard.Application.Reports;
 using WinCCDashboard.Domain.Entities;
 
@@ -11,14 +12,17 @@ public class ReportsController : Controller
     private readonly IAlarmHistoryPdfGenerator _alarmHistoryPdfGenerator;
     private readonly IDailySummaryPdfGenerator _dailySummaryPdfGenerator;
 
+    private readonly ISsrsReportClient _ssrsClient;
+
     public ReportsController(
         ReportQueryService reportsService,
         IAlarmHistoryPdfGenerator alarmHistoryPdfGenerator,
-        IDailySummaryPdfGenerator dailySummaryPdfGenerator)
+        IDailySummaryPdfGenerator dailySummaryPdfGenerator, ISsrsReportClient ssrsClient)
     {
         _reportsService = reportsService;
         _alarmHistoryPdfGenerator = alarmHistoryPdfGenerator;
         _dailySummaryPdfGenerator = dailySummaryPdfGenerator;
+        _ssrsClient = ssrsClient;
     }
 
     public async Task<IActionResult> Index(
@@ -105,6 +109,13 @@ public class ReportsController : Controller
         return File(pdf, "application/pdf", fileName);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> ExportAlarmHistorySsrs(
+    CancellationToken cancellationToken = default)
+    {
+        var dummy = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        return File(dummy, "application/octet-stream", "test.bin");
+    }
     private static AlarmReportFilter BuildFilter(
         int page, int pageSize, string? search, int? priority,
         string? sourceServer, DateTime? startDate, DateTime? endDate)
