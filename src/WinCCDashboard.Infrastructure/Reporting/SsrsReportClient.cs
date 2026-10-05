@@ -72,7 +72,11 @@ public class SsrsReportClient : ISsrsReportClient
         {
             foreach (var (key, value) in parameters)
             {
-                if (string.IsNullOrWhiteSpace(value)) continue;
+                // Skip empty strings (SSRS integer/date parameters ke liye invalid hote hain)
+                // Sirf null bhi skip karo
+                if (string.IsNullOrWhiteSpace(value))
+                    continue;
+
                 sb.Append($"&{Uri.EscapeDataString(key)}=");
                 sb.Append(Uri.EscapeDataString(value));
             }

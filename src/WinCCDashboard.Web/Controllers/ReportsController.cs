@@ -1,138 +1,103 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WinCCDashboard.Application.Abstractions.Pdf;
+using WinCCDashboard.Application.Abstractions.Persistence;
 using WinCCDashboard.Application.Abstractions.Reporting;
-using WinCCDashboard.Application.Reports;
-using WinCCDashboard.Domain.Entities;
 
 namespace WinCCCustomDashboardMarefa.Controllers;
 
 public class ReportsController : Controller
 {
-    private readonly ReportQueryService _reportsService;
-    private readonly IAlarmHistoryPdfGenerator _alarmHistoryPdfGenerator;
-    private readonly IDailySummaryPdfGenerator _dailySummaryPdfGenerator;
-
-    private readonly ISsrsReportClient _ssrsClient;
+    private readonly IReportDefinitionRepository _reports;
+    private readonly ISsrsReportClient _ssrs;
+    private readonly IConfiguration _config;
 
     public ReportsController(
-        ReportQueryService reportsService,
-        IAlarmHistoryPdfGenerator alarmHistoryPdfGenerator,
-        IDailySummaryPdfGenerator dailySummaryPdfGenerator, ISsrsReportClient ssrsClient)
+        IReportDefinitionRepository reports,
+        ISsrsReportClient ssrs,
+        IConfiguration config)
     {
-        _reportsService = reportsService;
-        _alarmHistoryPdfGenerator = alarmHistoryPdfGenerator;
-        _dailySummaryPdfGenerator = dailySummaryPdfGenerator;
-        _ssrsClient = ssrsClient;
+        _reports = reports;
+        _ssrs = ssrs;
+        _config = config;
     }
 
+    // -----------------------------------------------------------
+    // Report list page (grouped by category, from DB)
+    // -----------------------------------------------------------
     public async Task<IActionResult> Index(
-        int page = 1,
-        int pageSize = 50,
-        string? search = null,
-        int? priority = null,
-        string? sourceServer = null,
-        DateTime? startDate = null,
-        DateTime? endDate = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        var filter = BuildFilter(page, pageSize, search, priority,
-            sourceServer, startDate, endDate);
+        var reports = await _reports.GetAllAsync(cancellationToken);
 
-        var alarmHistory = await _reportsService.GetAlarmHistoryAsync(
-            filter, cancellationToken);
+        ViewBag.SsrsUrl = _config["SsrsSettings:PublicUrl"];
+        ViewBag.Folder = _config["SsrsSettings:ReportsFolder"];
 
-        ViewBag.Filter = filter;
-        ViewBag.SelectedReport = "AlarmHistory";
-
-        return View(alarmHistory);
+        return View(reports);
     }
 
-    public async Task<IActionResult> DailySummary(
-        int page = 1,
-        int pageSize = 50,
-        int? priority = null,
-        string? sourceServer = null,
-        DateTime? startDate = null,
-        DateTime? endDate = null,
-        CancellationToken cancellationToken = default)
-    {
-        var filter = BuildFilter(page, pageSize, null, priority,
-            sourceServer, startDate, endDate);
-
-        var result = await _reportsService.GetDailyAlarmSummaryAsync(
-            filter, cancellationToken);
-
-        ViewBag.Filter = filter;
-        ViewBag.SelectedReport = "DailySummary";
-
-        return View(result);
-    }
-
+    // -----------------------------------------------------------
+    // Report viewer (iframe embeds SSRS)
+    // -----------------------------------------------------------
     [HttpGet]
-    public async Task<IActionResult> ExportAlarmHistory(
-        string? search = null,
-        int? priority = null,
-        string? sourceServer = null,
-        DateTime? startDate = null,
-        DateTime? endDate = null,
-        CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Show(
+        string key,
+        CancellationToken cancellationToken)
     {
-        var filter = BuildFilter(1, 500, search, priority,
-            sourceServer, startDate, endDate);
+        var report = await _reports.GetByKeyAsync(key, cancellationToken);
+        if (report == null)
+            return NotFound($"Report '{key}' not found.");
 
-        var alarms = await _reportsService.GetAlarmHistoryForExportAsync(
-            filter, cancellationToken);
+        ViewBag.SsrsUrl = _config["SsrsSettings:PublicUrl"];
+        ViewBag.Folder = _config["SsrsSettings:ReportsFolder"];
 
-        var pdf = _alarmHistoryPdfGenerator.Generate(alarms);
-        var fileName = $"AlarmHistory_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
-
-        return File(pdf, "application/pdf", fileName);
+        return View(report);
     }
 
+    // -----------------------------------------------------------
+    // Generic PDF download (all reports)
+    // -----------------------------------------------------------
     [HttpGet]
-    public async Task<IActionResult> ExportDailySummary(
-        int? priority = null,
-        string? sourceServer = null,
-        DateTime? startDate = null,
-        DateTime? endDate = null,
-        CancellationToken cancellationToken = default)
-    {
-        var filter = BuildFilter(1, 500, null, priority,
-            sourceServer, startDate, endDate);
-
-        var data = await _reportsService.GetDailyAlarmSummaryForExportAsync(
-            filter, cancellationToken);
-
-        var pdf = _dailySummaryPdfGenerator.Generate(data);
-        var fileName = $"DailyAlarmSummary_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
-
-        return File(pdf, "application/pdf", fileName);
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> ExportAlarmHistorySsrs(
+    public async Task<IActionResult> Export(
+    string key,
+    string? search = null,
+    int? priority = null,
+    string? sourceServer = null,
+    DateTime? startDate = null,
+    DateTime? endDate = null,
     CancellationToken cancellationToken = default)
     {
-        var dummy = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        return File(dummy, "application/octet-stream", "test.bin");
-    }
-    private static AlarmReportFilter BuildFilter(
-        int page, int pageSize, string? search, int? priority,
-        string? sourceServer, DateTime? startDate, DateTime? endDate)
-    {
-        if (page < 1) page = 1;
-        if (pageSize < 10) pageSize = 50;
-        if (pageSize > 500) pageSize = 500;
+        var report = await _reports.GetByKeyAsync(key, cancellationToken);
+        if (report == null)
+            return NotFound($"Report '{key}' not found.");
 
-        return new AlarmReportFilter
+        // Base parameters
+        var parameters = new Dictionary<string, string?>
         {
-            Page = page,
-            PageSize = pageSize,
-            Search = search,
-            Priority = priority,
-            SourceServer = sourceServer,
-            StartDate = startDate,
-            EndDate = endDate
+            ["Search"] = search ?? string.Empty,
+            ["Priority"] = priority?.ToString() ?? string.Empty,
+            ["SourceServer"] = sourceServer ?? string.Empty,
+            ["StartDate"] = (startDate ?? DateTime.UtcNow.AddDays(-30))
+                .ToString("yyyy-MM-ddTHH:mm:ss"),
+            ["EndDate"] = (endDate ?? DateTime.UtcNow)
+                .ToString("yyyy-MM-ddTHH:mm:ss")
         };
+
+        // Category-specific parameters
+        if (report.ReportKey == "RedundancyEvents")
+            parameters["Category"] = "Redundancy";
+        else if (report.ReportKey == "SystemEvents")
+            parameters["Category"] = "System";
+
+        try
+        {
+            var bytes = await _ssrs.RenderReportAsync(
+                report.RdlName, "PDF", parameters, cancellationToken);
+
+            var fileName = $"{report.ReportKey}_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            return File(bytes, "application/pdf", fileName);
+        }
+        catch (Exception ex)
+        {
+            return Content($"SSRS error: {ex.Message}", "text/plain");
+        }
     }
 }

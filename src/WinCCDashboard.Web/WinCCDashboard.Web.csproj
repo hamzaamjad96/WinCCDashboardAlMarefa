@@ -17,4 +17,8 @@
     <ProjectReference Include="..\WinCCDashboard.Infrastructure\WinCCDashboard.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ViewModels\Reports\" />
+  </ItemGroup>
+
 </Project>
