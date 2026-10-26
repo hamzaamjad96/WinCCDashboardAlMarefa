@@ -13,6 +13,8 @@ public static class DependencyInjection
         services.AddScoped<AlarmQueryService>();
         services.AddScoped<DashboardQueryService>();
         services.AddScoped<ReportQueryService>();
+        services.AddScoped<ReportParameterService>();
+        services.AddSingleton<ReportMetadataCache>();
         return services;
     }
 }

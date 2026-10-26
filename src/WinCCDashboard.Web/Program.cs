@@ -29,6 +29,18 @@ else
 }
 
 app.UseHttpsRedirection();
+
+// Basic hardening. Reports are rendered by this server and shown in a
+// same-origin frame, so SAMEORIGIN framing is all the site needs.
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "SAMEORIGIN";
+    headers["Referrer-Policy"] = "same-origin";
+    await next();
+});
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();

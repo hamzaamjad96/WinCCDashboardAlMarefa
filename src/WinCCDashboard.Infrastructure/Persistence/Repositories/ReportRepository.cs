@@ -147,6 +147,36 @@ public class ReportRepository : IReportRepository
         return result;
     }
 
+    // ---------------- Filter lookups ----------------
+
+    public async Task<ReportFilterLookups> GetFilterLookupsAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var result = new ReportFilterLookups();
+
+        await using var connection = await _factory.CreateAsync(cancellationToken);
+
+        const string sql = """
+            SELECT DISTINCT Priority FROM dbo.AlarmEvents WHERE Priority IS NOT NULL ORDER BY Priority;
+            SELECT DISTINCT SourceServer FROM dbo.AlarmEvents ORDER BY SourceServer;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        while (await reader.ReadAsync(cancellationToken))
+            result.Priorities.Add(reader.GetInt32(0));
+
+        if (await reader.NextResultAsync(cancellationToken))
+        {
+            while (await reader.ReadAsync(cancellationToken))
+                result.SourceServers.Add(reader.GetString(0));
+        }
+
+        return result;
+    }
+
     // ---------------- Helpers ----------------
 
     private static void AddAlarmHistoryParameters(
