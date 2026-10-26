@@ -458,6 +458,11 @@ body {
     .dashboard-cards {
         grid-template-columns: 1fr;
     }
+}
+
+/* The rules below were previously nested inside the 700px media query by a
+   missing closing brace, so buttons, tables and chart grids were only styled
+   on very narrow screens. */
 
     /* Report action bar */
     .report-actions-bar {
@@ -660,5 +665,361 @@ body {
     .report-card.active .report-icon {
         background: #2563eb;
         color: #ffffff;
+    }
+
+/* =========================
+   PAGE HEADER
+   ========================= */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .page-header p,
+    .page-subtitle {
+        margin: 4px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 4px;
+}
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+.card-description {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.card + .card {
+    margin-top: 18px;
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* =========================
+   REPORT VIEWER
+   ========================= */
+
+.rv-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.rv-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.rv-report-select {
+    min-width: 240px;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    font: inherit;
+}
+
+.rv-filters {
+    margin-bottom: 18px;
+    overflow: visible;
+}
+
+    .rv-filters .panel-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+.rv-quick-ranges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.rv-quick-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-right: 2px;
+}
+
+.rv-quick-ranges button {
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+}
+
+.rv-form {
+    padding: 18px 20px 20px;
+}
+
+.rv-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px 18px;
+    align-items: start;
+}
+
+.rv-fields-loading,
+.rv-no-filters {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6b7280;
+    font-size: 13px;
+    margin: 0;
+}
+
+.rv-field input,
+.rv-field select {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+}
+
+.rv-field select[multiple] {
+    min-height: 90px;
+}
+
+.rv-field-check {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 26px;
+}
+
+    .rv-field-check input {
+        width: auto;
+        margin: 0;
+    }
+
+.rv-help {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.rv-field.has-error input,
+.rv-field.has-error select {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 1px #dc2626;
+}
+
+.rv-field-error {
+    font-size: 12px;
+    color: #b91c1c;
+}
+
+.rv-form-error {
+    margin-top: 16px;
+    padding: 10px 12px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.rv-form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.rv-notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    color: #6b7280;
+    max-width: 640px;
+}
+
+    .rv-notes li + li {
+        margin-top: 3px;
+    }
+
+.rv-form-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.rv-toolbar {
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 12px 20px;
+}
+
+.rv-status {
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.rv-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+    .rv-toolbar-actions .btn {
+        padding: 7px 12px;
+    }
+
+.rv-toolbar-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-left: 2px;
+}
+
+.rv-divider {
+    width: 1px;
+    height: 22px;
+    background: #e5e7eb;
+    margin: 0 6px;
+}
+
+.rv-stage {
+    position: relative;
+    height: calc(100vh - 210px);
+    min-height: 520px;
+    background: #eef1f5;
+}
+
+.rv-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #eef1f5;
+}
+
+.rv-placeholder,
+.rv-message {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+    .rv-placeholder svg {
+        width: 44px;
+        height: 44px;
+        color: #9ca3af;
+        margin-bottom: 10px;
+    }
+
+    .rv-placeholder p,
+    .rv-message p {
+        margin: 6px 0 0;
+        max-width: 560px;
+    }
+
+.rv-message strong {
+    color: #1f2937;
+}
+
+.rv-message-error strong {
+    color: #991b1b;
+}
+
+.rv-placeholder[hidden],
+.rv-message[hidden],
+.rv-loading[hidden],
+.rv-frame[hidden] {
+    display: none;
+}
+
+.rv-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(245, 247, 250, 0.88);
+    z-index: 2;
+}
+
+.rv-loading-text {
+    font-size: 14px;
+    color: #374151;
+}
+
+.rv-spinner {
+    width: 34px;
+    height: 34px;
+    border: 3px solid #dbe3ef;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: rv-spin 0.8s linear infinite;
+}
+
+.rv-spinner-sm {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+@keyframes rv-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 700px) {
+    .rv-header-actions {
+        width: 100%;
+    }
+
+    .rv-report-select {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .rv-stage {
+        height: 70vh;
+        min-height: 380px;
     }
 }

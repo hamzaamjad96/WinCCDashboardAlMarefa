@@ -1,30 +1,123 @@
-﻿@model WinCCDashboard.Domain.Entities.ReportDefinition
+﻿@model WinCCDashboard.Web.ViewModels.Reports.ReportViewerViewModel
 
 @{
-    ViewData["Title"] = Model.Title;
-
-    var folder = ViewBag.Folder as string;
-
-    // TEMPORARY — hardcoded URL for testing
-    var embedUrl =
-        $"http://localhost/ReportServer?{folder}/{Model.RdlName}" +
-        "&rs:Command=Render" +
-        "&rc:Toolbar=true" +
-        "&rc:Parameters=true" +
-        "&rc:Zoom=100";
+    ViewData["Title"] = Model.Report.Title;
+    var groups = Model.Reports.GroupBy(r => r.Category).OrderBy(g => g.Key);
 }
 
-<div class="page-header">
+<div class="page-header rv-page-header">
     <div>
-        <h1>@Model.Title</h1>
-        <p class="page-subtitle">@Model.Description</p>
+        <h1>@Model.Report.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Report.Description))
+        {
+            <p class="page-subtitle">@Model.Report.Description</p>
+        }
     </div>
-    <div style="display:flex; gap:8px;">
-        <a asp-action="Export" asp-route-key="@Model.ReportKey" class="btn btn-danger">Download PDF</a>
-        <a asp-action="Index" class="btn btn-secondary">All Reports</a>
+
+    <div class="rv-header-actions">
+        <label class="rv-sr-only" for="rv-report-select">Report</label>
+        <select id="rv-report-select" class="rv-report-select"
+                data-show-url="@Url.Action("Show", "Reports")">
+            @foreach (var group in groups)
+            {
+                <optgroup label="@group.Key">
+                    @foreach (var r in group)
+                    {
+                        <option value="@r.ReportKey" selected="@(r.ReportKey == Model.Report.ReportKey)">@r.Title</option>
+                    }
+                </optgroup>
+            }
+        </select>
+        <a asp-action="Index" class="btn btn-secondary">All reports</a>
     </div>
 </div>
 
-<div class="card" style="overflow:hidden;">
-    <iframe src="@embedUrl" style="width:100%; height:900px; border:0; display:block;" title="@Model.Title"></iframe>
+<div id="report-viewer"
+     data-report-key="@Model.Report.ReportKey"
+     data-parameters-url="@Url.Action("Parameters", "Reports")"
+     data-render-url="@Url.Action("Render", "Reports")">
+
+    <!-- FILTERS -->
+    <section class="panel rv-filters">
+        <div class="panel-header">
+            <div class="panel-title">Filters</div>
+            <div class="rv-quick-ranges" hidden>
+                <span class="rv-quick-label">Quick range:</span>
+                <button type="button" class="range-btn" data-range="0">Today</button>
+                <button type="button" class="range-btn" data-range="6">Last 7 days</button>
+                <button type="button" class="range-btn" data-range="29">Last 30 days</button>
+            </div>
+        </div>
+
+        <form id="rv-form" class="rv-form" novalidate autocomplete="off">
+            <div class="rv-fields" id="rv-fields">
+                <div class="rv-fields-loading">
+                    <span class="rv-spinner rv-spinner-sm" aria-hidden="true"></span>
+                    Loading filters…
+                </div>
+            </div>
+
+            <div class="rv-form-error" id="rv-form-error" role="alert" hidden></div>
+
+            <div class="rv-form-footer">
+                <ul class="rv-notes" id="rv-notes"></ul>
+                <div class="rv-form-actions">
+                    <button type="button" class="btn btn-secondary" id="rv-reset" disabled>Reset filters</button>
+                    <button type="submit" class="btn btn-primary" id="rv-generate" disabled>Generate report</button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <!-- VIEWER -->
+    <section class="panel rv-viewer">
+        <div class="panel-header rv-toolbar">
+            <div class="rv-status" id="rv-status" aria-live="polite">No report generated yet</div>
+
+            <div class="rv-toolbar-actions">
+                <button type="button" class="btn btn-secondary" id="rv-print" disabled title="Print the report">Print</button>
+                <button type="button" class="btn btn-secondary" id="rv-open" disabled title="Open the PDF in a new browser tab">Open in new tab</button>
+                <span class="rv-divider" aria-hidden="true"></span>
+                <span class="rv-toolbar-label">Download:</span>
+                <button type="button" class="btn btn-secondary" data-download="PDF" disabled>PDF</button>
+                <button type="button" class="btn btn-secondary" data-download="EXCELOPENXML" disabled>Excel</button>
+                <button type="button" class="btn btn-secondary" data-download="WORDOPENXML" disabled>Word</button>
+                <button type="button" class="btn btn-secondary" data-download="CSV" disabled>CSV</button>
+            </div>
+        </div>
+
+        <div class="rv-stage" id="rv-stage">
+            <div class="rv-placeholder" id="rv-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                </svg>
+                <p>Choose the filters above and click <strong>Generate report</strong>.</p>
+            </div>
+
+            <div class="rv-message rv-message-error" id="rv-error" role="alert" hidden>
+                <strong>The report could not be generated.</strong>
+                <p id="rv-error-text"></p>
+            </div>
+
+            <div class="rv-message" id="rv-no-inline" hidden>
+                <strong>Your browser cannot show PDF reports inside the page.</strong>
+                <p>Use <em>Open in new tab</em> or download the report.</p>
+            </div>
+
+            <iframe id="rv-frame" class="rv-frame" title="@Model.Report.Title" hidden></iframe>
+
+            <div class="rv-loading" id="rv-loading" hidden>
+                <span class="rv-spinner" aria-hidden="true"></span>
+                <div class="rv-loading-text" id="rv-loading-text">Generating report…</div>
+                <button type="button" class="btn btn-secondary" id="rv-cancel">Cancel</button>
+            </div>
+        </div>
+    </section>
 </div>
+
+@section Scripts {
+    <script src="~/js/reports.js" asp-append-version="true"></script>
+}

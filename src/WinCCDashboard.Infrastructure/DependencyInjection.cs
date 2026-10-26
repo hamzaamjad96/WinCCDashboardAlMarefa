@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System.Net;
 using WinCCDashboard.Application.Abstractions.Pdf;
 using WinCCDashboard.Application.Abstractions.Persistence;
 using WinCCDashboard.Application.Abstractions.Reporting;
@@ -22,23 +24,39 @@ public static class DependencyInjection
         services.AddScoped<IAlarmRepository, AlarmRepository>();
         services.AddScoped<IDashboardRepository, DashboardRepository>();
         services.AddScoped<IReportRepository, ReportRepository>();
-        services.AddScoped<IReportDefinitionRepository, ReportDefinitionRepository>();  // ← YE ADD
+        services.AddScoped<IReportDefinitionRepository, ReportDefinitionRepository>();
 
         // PDF
         services.AddSingleton<IAlarmHistoryPdfGenerator, AlarmHistoryPdfGenerator>();
         services.AddSingleton<IDailySummaryPdfGenerator, DailySummaryPdfGenerator>();
 
-        // SSRS Reporting
+        // SSRS Reporting (server-side only; the browser never calls SSRS)
         services.Configure<SsrsSettings>(configuration.GetSection("SsrsSettings"));
+        services.AddSingleton(sp => sp.GetRequiredService<IOptions<SsrsSettings>>().Value);
 
         services.AddHttpClient<ISsrsReportClient, SsrsReportClient>()
-            .ConfigurePrimaryHttpMessageHandler(() =>
+            .ConfigurePrimaryHttpMessageHandler(sp =>
             {
-                return new HttpClientHandler
+                var settings = sp.GetRequiredService<IOptions<SsrsSettings>>().Value;
+
+                var handler = new HttpClientHandler
                 {
-                    UseDefaultCredentials = true,
                     PreAuthenticate = true
                 };
+
+                if (!string.IsNullOrWhiteSpace(settings.Username))
+                {
+                    // Dedicated service account (password from user-secrets / environment).
+                    handler.Credentials = new NetworkCredential(
+                        settings.Username, settings.Password, settings.Domain);
+                }
+                else
+                {
+                    // Identity of the web app process (IIS app pool / Windows service account).
+                    handler.UseDefaultCredentials = true;
+                }
+
+                return handler;
             });
 
         return services;

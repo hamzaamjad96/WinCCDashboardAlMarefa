@@ -20,4 +20,8 @@ public interface IReportRepository
     Task<List<DailyAlarmSummary>> GetDailyAlarmSummaryForExportAsync(
         AlarmReportFilter filter,
         CancellationToken cancellationToken = default);
+
+    /// <summary>Distinct priorities and source servers for report filter dropdowns.</summary>
+    Task<ReportFilterLookups> GetFilterLookupsAsync(
+        CancellationToken cancellationToken = default);
 }
